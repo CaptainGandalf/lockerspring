@@ -2,7 +2,11 @@ package com.locker.locker.controllers;
 
 import com.locker.locker.dtos.LockDto;
 import com.locker.locker.dtos.GenericError;
+import com.locker.locker.dtos.LockStateDto;
+import com.locker.locker.entities.AccessLog;
 import com.locker.locker.entities.Lock;
+import com.locker.locker.entities.User;
+import com.locker.locker.services.AccessLogService;
 import com.locker.locker.services.LockService;
 import com.locker.locker.services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +33,9 @@ public class LockController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    AccessLogService accessLogService;
+
     @GetMapping
     public ResponseEntity<List<LockDto>> findAll() {
         List<Lock> locks = lockService.findAll();
@@ -54,6 +61,28 @@ public class LockController {
         }
         Lock lock = convertToEntity(lockDto);
         lockService.save(lock);
+        return ResponseEntity.ok(convertToDto(lock));
+    }
+
+    @PostMapping("/updateState")
+    public ResponseEntity<LockDto> updateState(@Valid @RequestBody LockStateDto lockStateDto){
+        if(!userService.findById(lockStateDto.getUserid()).isPresent()){
+            log.error("User " + lockStateDto.getUserid() + " does not exist");
+            return ResponseEntity.badRequest().build();
+        }
+        if(!lockService.findById(lockStateDto.getId()).isPresent()) {
+            log.error("Lock " + lockStateDto.getId() + " does not exist");
+            return ResponseEntity.badRequest().build();
+        }
+        User user = userService.findById(lockStateDto.getUserid()).get();
+        Lock lock = lockService.findById(lockStateDto.getId()).get();
+        lock.setStatus(lockStateDto.getStatus());
+        lockService.save(lock);
+
+        AccessLog log = new AccessLog();
+        log.setUser(user);
+        log.setLock(lock);
+        accessLogService.save(log);
         return ResponseEntity.ok(convertToDto(lock));
     }
 
