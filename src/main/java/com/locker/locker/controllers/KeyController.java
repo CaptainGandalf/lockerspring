@@ -118,6 +118,7 @@ public class KeyController {
         key.setIssuedBy(userService.findById(keyDto.getIssuedById()).get());
         key.setIssuedFor(userService.findByEmail(keyDto.getIssuedForEmail()).get());
         key.setLock(lockService.findById(keyDto.getLockId()).get());
+        key.setExpiresAt(keyDto.getExpiresAt());
         return key;
     }
 

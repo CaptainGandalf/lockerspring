@@ -25,13 +25,6 @@ public class LockerApplication {
 	}
 
 	public static void main(String[] args) {
-
-	    User user = new User();
-	    user.setEmail("skirmantas@email.com");
-	    user.setName("Skirmantas");
-	    user.setLastName("Stanaitis");
-	    user.setIdNowPicture("dfakjsbfanfa");
-
 	    SpringApplication.run(LockerApplication.class, args);
 	}
 

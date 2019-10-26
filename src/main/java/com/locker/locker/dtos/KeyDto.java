@@ -1,5 +1,6 @@
 package com.locker.locker.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class KeyDto {
 
     private Long lockId;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime expiresAt;
 
 }

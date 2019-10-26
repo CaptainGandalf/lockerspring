@@ -4,10 +4,8 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.jws.soap.SOAPBinding;
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.Date;
 
 @Entity
@@ -33,8 +31,8 @@ public class Key {
     @JoinColumn(name = "userIssuedFor_id")
     private User issuedFor;
 
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime expiresAt;
-
 
     @CreationTimestamp
     private Date createdAt;
