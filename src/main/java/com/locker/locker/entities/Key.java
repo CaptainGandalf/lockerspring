@@ -6,6 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.jws.soap.SOAPBinding;
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,9 +17,9 @@ public class Key {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String address;
-
-    private String door;
+    //DISABLED ENABLED
+    @Column(nullable = false)
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "lock_id")
@@ -31,6 +32,8 @@ public class Key {
     @ManyToOne
     @JoinColumn(name = "userIssuedFor_id")
     private User issuedFor;
+
+    private LocalDateTime expiresAt;
 
 
     @CreationTimestamp

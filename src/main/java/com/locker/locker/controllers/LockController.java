@@ -1,7 +1,7 @@
 package com.locker.locker.controllers;
 
 import com.locker.locker.dtos.LockDto;
-import com.locker.locker.dtos.LockErrorDto;
+import com.locker.locker.dtos.GenericError;
 import com.locker.locker.entities.Lock;
 import com.locker.locker.services.LockService;
 import com.locker.locker.services.UserService;
@@ -38,9 +38,9 @@ public class LockController {
     @PostMapping
     public ResponseEntity<LockDto> create(@Valid @RequestBody LockDto lockToSave){
         if(!userService.findById(lockToSave.getUserid()).isPresent()){
-            LockErrorDto lockErrorDto = new LockErrorDto();
-            lockErrorDto.setMessage("User with id:"+lockToSave.getUserid()+" was not found");
-            ResponseEntity.ok(lockErrorDto);
+            GenericError genericError = new GenericError();
+            genericError.setMessage("User with id:"+lockToSave.getUserid()+" was not found");
+            ResponseEntity.ok(genericError);
         }
         Lock lock = lockService.save(convertToEntity(lockToSave));
         return ResponseEntity.ok(convertToDto(lock));
