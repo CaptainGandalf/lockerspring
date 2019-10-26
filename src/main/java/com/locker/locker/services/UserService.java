@@ -30,6 +30,7 @@ public class UserService {
 
     public Optional<User> findByEmail(String email) { return userRepository.findByEmail(email);}
 
+    //TODO: check if user is owner of the lock he gives access to
     public User save(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);

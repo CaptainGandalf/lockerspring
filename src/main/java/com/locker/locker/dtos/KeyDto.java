@@ -19,6 +19,4 @@ public class KeyDto {
 
     private LocalDateTime expiresAt;
 
-    private String idNowPicture;
-
 }

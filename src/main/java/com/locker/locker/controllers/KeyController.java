@@ -55,12 +55,12 @@ public class KeyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<KeyDto> update(@Valid @RequestBody KeyDto keyDto){
-        if(!keyService.findById(keyDto.getId()).isPresent()){
-            log.error("Key " + keyDto.getId() + " does not exist");
+    public ResponseEntity<KeyDto> update(@Valid @RequestBody KeyDto keyDto, @PathVariable Long id){
+        if(!keyService.findById(id).isPresent()){
+            log.error("Key " + id + " does not exist");
             return ResponseEntity.badRequest().build();
         }
-        Key key = convertToEntity(keyDto);
+        Key key = convertToEntity(keyDto, id);
         keyService.save(key);
         return ResponseEntity.ok(convertToDto(key));
     }
@@ -102,6 +102,15 @@ public class KeyController {
         }
         lockService.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    private  Key convertToEntity(KeyDto keyDto, Long id){
+        Key key = modelMapper.map(keyDto, Key.class);
+        key.setId(id);
+        key.setIssuedBy(userService.findById(keyDto.getIssuedById()).get());
+        key.setIssuedFor(userService.findById(keyDto.getIssuedForId()).get());
+        key.setLock(lockService.findById(keyDto.getLockId()).get());
+        return key;
     }
 
     private  Key convertToEntity(KeyDto keyDto){
