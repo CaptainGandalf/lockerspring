@@ -45,8 +45,8 @@ public class KeyController {
 
     @PostMapping
     public ResponseEntity<KeyDto> create(@Valid @RequestBody KeyDto keyToSave){
-        if(!userService.findById(keyToSave.getIssuedById()).isPresent() || !userService.findById(keyToSave.getIssuedForId()).isPresent()){
-            ResponseEntity.ok(createError("User with id:"+keyToSave.getIssuedById()+" or " +keyToSave.getIssuedForId()+ " was not found"));
+        if(!userService.findById(keyToSave.getIssuedById()).isPresent() || !userService.findByEmail(keyToSave.getIssuedForEmail()).isPresent()){
+            ResponseEntity.ok(createError("User with id:"+keyToSave.getIssuedById()+" or " +keyToSave.getIssuedForEmail()+ " was not found"));
         } else if(!lockService.findById(keyToSave.getLockId()).isPresent()){
             ResponseEntity.ok(createError("Lock with id:"+keyToSave.getLockId()+" was not found"));
         }
@@ -108,7 +108,7 @@ public class KeyController {
         Key key = modelMapper.map(keyDto, Key.class);
         key.setId(id);
         key.setIssuedBy(userService.findById(keyDto.getIssuedById()).get());
-        key.setIssuedFor(userService.findById(keyDto.getIssuedForId()).get());
+        key.setIssuedFor(userService.findByEmail(keyDto.getIssuedForEmail()).get());
         key.setLock(lockService.findById(keyDto.getLockId()).get());
         return key;
     }
@@ -116,7 +116,7 @@ public class KeyController {
     private  Key convertToEntity(KeyDto keyDto){
         Key key = modelMapper.map(keyDto, Key.class);
         key.setIssuedBy(userService.findById(keyDto.getIssuedById()).get());
-        key.setIssuedFor(userService.findById(keyDto.getIssuedForId()).get());
+        key.setIssuedFor(userService.findByEmail(keyDto.getIssuedForEmail()).get());
         key.setLock(lockService.findById(keyDto.getLockId()).get());
         return key;
     }
@@ -124,7 +124,7 @@ public class KeyController {
     private  KeyDto convertToDto(Key key){
         KeyDto keyDto = modelMapper.map(key, KeyDto.class);
         keyDto.setIssuedById(key.getIssuedBy().getId());
-        keyDto.setIssuedForId(key.getIssuedFor().getId());
+        keyDto.setIssuedForEmail(userService.findById(key.getIssuedFor().getId()).get().getEmail());
         keyDto.setLockId(key.getLock().getId());
         return keyDto;
     }

@@ -13,7 +13,7 @@ public class KeyDto {
 
     private Long issuedById;
 
-    private Long issuedForId;
+    private String issuedForEmail;
 
     private Long lockId;
 
