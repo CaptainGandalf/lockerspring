@@ -4,12 +4,14 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.jws.soap.SOAPBinding;
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
 @Data
-public class Lock {
+public class Key {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,12 +20,18 @@ public class Lock {
 
     private String door;
 
-    @Column(nullable = false)
-    private String status;
+    @ManyToOne
+    @JoinColumn(name = "lock_id")
+    private Lock lock;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "userIssuedBy_id")
+    private User issuedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "userIssuedFor_id")
+    private User issuedFor;
+
 
     @CreationTimestamp
     private Date createdAt;

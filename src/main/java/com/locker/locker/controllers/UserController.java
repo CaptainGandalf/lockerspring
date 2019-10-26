@@ -1,5 +1,6 @@
 package com.locker.locker.controllers;
 
+import com.locker.locker.dtos.LockDto;
 import com.locker.locker.dtos.UserCreateDto;
 import com.locker.locker.dtos.UserDto;
 import com.locker.locker.entities.User;

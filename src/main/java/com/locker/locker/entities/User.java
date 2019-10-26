@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 
@@ -28,6 +29,9 @@ public class User {
     private String password;
 
     private String idNowPicture;
+
+    @OneToMany(mappedBy = "user")
+    private List<Lock> locks;
 
     @CreationTimestamp
     private Date createdAt;
