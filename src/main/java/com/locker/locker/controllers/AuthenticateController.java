@@ -38,4 +38,6 @@ public class AuthenticateController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    // TODO: idnow compare on auth
 }

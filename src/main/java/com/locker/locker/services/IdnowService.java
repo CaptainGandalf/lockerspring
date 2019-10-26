@@ -22,6 +22,10 @@ public class IdnowService {
     @Value("${spring.idnow.url}")
     String url;
 
+    public FaceVerifyStatusDto verifyFaceImage(String base64EncodedImage){
+        return this.verifyFaceImage(base64EncodedImage, new String[] { "FACE" });
+    }
+
     public FaceVerifyStatusDto verifyFaceImage(String base64EncodedImage, String[] faceTypes){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

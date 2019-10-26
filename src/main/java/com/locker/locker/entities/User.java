@@ -28,6 +28,7 @@ public class User {
 
     private String password;
 
+    @Column(columnDefinition="TEXT")
     private String idNowPicture;
 
     @OneToMany(mappedBy = "user")
