@@ -39,7 +39,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserCreateStatusDto> create(@Valid @RequestBody UserCreateDto userDto) {
         UserCreateStatusDto response = new UserCreateStatusDto();
+        log.info(userDto.getIdNowPicture());
         String message = verifyImage(userDto.getIdNowPicture());
+
         response.setMessage(message);
         if ("OK".equals(message)) {
             User user = convertToEntity(userDto);
@@ -110,13 +112,12 @@ public class UserController {
                 } else if (!idStatus.getFeedback().getFullFrontalOk()) {
                     log.error("ID image should contain full frontal portrait");
                     return "ID image should contain full frontal portrait";
-                } else {
-                    return "OK";
                 }
             } catch (HttpServerErrorException e) {
                 log.error("Error on ID image verification", e);
+                return "ID image verification failed";
             }
         }
-        return "ID image verification failed";
+        return "OK";
     }
 }
