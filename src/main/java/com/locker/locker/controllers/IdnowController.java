@@ -28,8 +28,7 @@ public class IdnowController {
     @ResponseBody
     public ResponseEntity<FaceVerifyStatusDto> verifyFaceImage(@Valid @NotBlank @RequestBody Map<String, String> body) {
         String base64EncodedImage = body.get("base64EncodedImage");
-        String[] faceTypes = new String [] {"FACE"};
-        FaceVerifyStatusDto response = idnowService.verifyFaceImage(base64EncodedImage, faceTypes);
+        FaceVerifyStatusDto response = idnowService.verifyFaceImage(base64EncodedImage);
         return ResponseEntity.ok(response);
     }
 
