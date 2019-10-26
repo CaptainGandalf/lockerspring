@@ -3,7 +3,7 @@ package com.locker.locker.dtos;
 import lombok.Data;
 
 @Data
-public class UserDto {
+public class UserCreateDto {
 
     private Long id;
 
@@ -12,6 +12,8 @@ public class UserDto {
     private String lastName;
 
     private String email;
+
+    private String password;
 
     private String idNowPicture;
 

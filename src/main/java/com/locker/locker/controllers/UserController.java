@@ -1,5 +1,6 @@
 package com.locker.locker.controllers;
 
+import com.locker.locker.dtos.UserCreateDto;
 import com.locker.locker.dtos.UserDto;
 import com.locker.locker.entities.User;
 import com.locker.locker.services.UserService;
@@ -31,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto userDto){
+    public ResponseEntity<UserDto> create(@Valid @RequestBody UserCreateDto userDto){
         User user = convertToEntity(userDto);
         User userCreated = userService.save(user);
         return ResponseEntity.ok(convertToDto(userCreated));
@@ -41,7 +42,7 @@ public class UserController {
     public ResponseEntity<UserDto> update(@PathVariable Long id, @Valid @RequestBody UserDto userDto){
         if(!userService.findById(id).isPresent()){
             log.error("Id " + id + " does not exist");
-            ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().build();
         }
         User user = convertToEntity(userDto);
         User userCreated = userService.save(user);
@@ -52,7 +53,7 @@ public class UserController {
     public ResponseEntity<UserDto> findById(@PathVariable Long id){
         if(!userService.findById(id).isPresent()){
             log.error("Id " + id + " does not exist");
-            ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(convertToDto(userService.findById(id).get()));
     }
@@ -73,6 +74,11 @@ public class UserController {
     }
 
     private  User convertToEntity(UserDto userDto){
+        User user = modelMapper.map(userDto, User.class);
+        return user;
+    }
+
+    private  User convertToEntity(UserCreateDto userDto){
         User user = modelMapper.map(userDto, User.class);
         return user;
     }

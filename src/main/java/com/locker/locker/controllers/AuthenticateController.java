@@ -1,12 +1,38 @@
 package com.locker.locker.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.locker.locker.dtos.UserAuthDto;
+import com.locker.locker.entities.User;
+import com.locker.locker.services.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
+@Slf4j
 @RestController
 @RequestMapping("/authenticate")
 public class AuthenticateController {
 
+    @Autowired
+    UserService userService;
 
+
+    @PostMapping
+    public ResponseEntity authenticate(@Valid @RequestBody UserAuthDto credentials){
+        if(!userService.findByEmail(credentials.getEmail()).isPresent()){
+            log.error("User with email " + credentials.getEmail() + " does not exist");
+            return ResponseEntity.badRequest().build();
+        }
+
+        User user = userService.findByEmail(credentials.getEmail()).get();
+
+        if (userService.checkPasswords(credentials.getEmail(), credentials.getPassword())){
+            return ResponseEntity.ok().build();
+        }else {
+            log.error("passwords dont match");
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
