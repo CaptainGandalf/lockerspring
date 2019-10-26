@@ -30,7 +30,7 @@ public class IdnowController {
     ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<FaceCompareResultDto> idnow(@Valid @RequestBody UserIdnowDto userIdnow){
+    public ResponseEntity<UserIdnowResultDto> idnow(@Valid @RequestBody UserIdnowDto userIdnow){
         User user;
         if(userIdnow.getUserId() != null && userService.findById(userIdnow.getUserId()).isPresent()){
             user = userService.findById(userIdnow.getUserId()).get();
@@ -40,8 +40,27 @@ public class IdnowController {
             log.error("User with email " + userIdnow.getEmail() + " or id " + userIdnow.getUserId() + " was not found");
             return ResponseEntity.badRequest().build();
         }
-        FaceCompareResultDto result = idnowService.verifyFaceImage(user.getIdNowPicture(), userIdnow.getIdNowPicture());
+        UserIdnowResultDto result = this.verifyIdnow(user.getIdNowPicture(), userIdnow.getIdNowPicture());
         return ResponseEntity.ok(result);
+    }
+
+    public UserIdnowResultDto verifyIdnow(String base64EncodedDocumentFaceImage, String base64EncodedFrontalFaceImage){
+        String message = idnowService.verifyFaceImage(base64EncodedFrontalFaceImage);
+        UserIdnowResultDto result = new UserIdnowResultDto();
+        result.setMessage(message);
+        if (!"OK".equals(message)) {
+            result.setAccepted(false);
+            result.setStatus("failed");
+        } else if (base64EncodedFrontalFaceImage.equals(base64EncodedDocumentFaceImage)) {
+            // Skipping comparison if image string matches (trusting that DB contains correct data)
+            result.setAccepted(true);
+            result.setResult(1.0);
+            result.setNormalized_score(100.0);
+        } else {
+            FaceCompareResultDto compare = idnowService.faceComparison(base64EncodedDocumentFaceImage, base64EncodedFrontalFaceImage);
+            modelMapper.map(compare, result);
+        }
+        return result;
     }
 
 //    @PostMapping(path = "/verifyFaceImage")
