@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.locker.locker.Config;
 
 import com.zaxxer.hikari.*;
 import org.springframework.beans.factory.annotation.Value;
