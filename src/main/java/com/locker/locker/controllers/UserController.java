@@ -39,9 +39,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserCreateStatusDto> create(@Valid @RequestBody UserCreateDto userDto) {
         UserCreateStatusDto response = new UserCreateStatusDto();
-        log.info(userDto.getIdNowPicture());
-        String message = verifyImage(userDto.getIdNowPicture());
-
+        String message = idnowService.verifyFaceImage(userDto.getIdNowPicture());
         response.setMessage(message);
         if ("OK".equals(message)) {
             User user = convertToEntity(userDto);
@@ -99,25 +97,4 @@ public class UserController {
         return user;
     }
 
-    private String verifyImage(String base64EncodedImage) {
-        if (!base64EncodedImage.equals("test")) {
-            try {
-                FaceVerifyStatusDto idStatus = idnowService.verifyFaceImage(base64EncodedImage);
-                if (idStatus == null || idStatus.getFeedback() == null || !idStatus.getFeedback().getSuccess()) {
-                    log.error("ID image verification failed");
-                    return "ID image verification failed";
-                } else if (!idStatus.getFeedback().getExposureOk() || !idStatus.getFeedback().getImageSharp() || !idStatus.getFeedback().getFocusOk()) {
-                    log.error("ID image quality poor");
-                    return "ID image quality poor";
-                } else if (!idStatus.getFeedback().getFullFrontalOk()) {
-                    log.error("ID image should contain full frontal portrait");
-                    return "ID image should contain full frontal portrait";
-                }
-            } catch (HttpServerErrorException e) {
-                log.error("Error on ID image verification", e);
-                return "ID image verification failed";
-            }
-        }
-        return "OK";
-    }
 }
