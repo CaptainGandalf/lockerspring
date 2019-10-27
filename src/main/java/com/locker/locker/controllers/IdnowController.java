@@ -9,6 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -30,11 +32,11 @@ public class IdnowController {
     ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<UserIdnowResultDto> idnow(@Valid @RequestBody UserIdnowDto userIdnow){
+    public ResponseEntity<UserIdnowResultDto> idnow(@Valid @RequestBody UserIdnowDto userIdnow) {
         User user;
-        if(userIdnow.getUserId() != null && userService.findById(userIdnow.getUserId()).isPresent()){
+        if (userIdnow.getUserId() != null && userService.findById(userIdnow.getUserId()).isPresent()) {
             user = userService.findById(userIdnow.getUserId()).get();
-        } else if (userIdnow.getEmail() != null && userService.findByEmail(userIdnow.getEmail()).isPresent()){
+        } else if (userIdnow.getEmail() != null && userService.findByEmail(userIdnow.getEmail()).isPresent()) {
             user = userService.findByEmail(userIdnow.getEmail()).get();
         } else {
             log.error("User with email " + userIdnow.getEmail() + " or id " + userIdnow.getUserId() + " was not found");
@@ -44,22 +46,32 @@ public class IdnowController {
         return ResponseEntity.ok(result);
     }
 
-    public UserIdnowResultDto verifyIdnow(String base64EncodedDocumentFaceImage, String base64EncodedFrontalFaceImage){
-        String message = idnowService.verifyFaceImage(base64EncodedFrontalFaceImage);
+    public UserIdnowResultDto verifyIdnow(String base64EncodedDocumentFaceImage, String base64EncodedFrontalFaceImage) {
+        String imageStatus = idnowService.verifyFaceImage(base64EncodedFrontalFaceImage);
         UserIdnowResultDto result = new UserIdnowResultDto();
-        result.setMessage(message);
-        if (!"OK".equals(message)) {
+        if (!"OK".equals(imageStatus)) {
             result.setAccepted(false);
+            result.setMessage(imageStatus);
             result.setStatus("failed");
         } else if (base64EncodedFrontalFaceImage.equals(base64EncodedDocumentFaceImage)) {
             // Skipping comparison if image string matches (trusting that DB contains correct data)
             result.setAccepted(true);
             result.setResult(1.0);
             result.setNormalized_score(100.0);
+            result.setMessage("User is allowed");
+            result.setStatus("success");
         } else {
-            FaceCompareResultDto compare = idnowService.faceComparison(base64EncodedDocumentFaceImage, base64EncodedFrontalFaceImage);
-            modelMapper.map(compare, result);
+            try {
+                FaceCompareResultDto compare = idnowService.faceComparison(base64EncodedDocumentFaceImage, base64EncodedFrontalFaceImage);
+                modelMapper.map(compare, result);
+            } catch (HttpStatusCodeException e) {
+                result.setAccepted(false);
+                log.error("Error on face comparison", e);
+            }
+            result.setMessage(result.getAccepted() ? "User is allowed" : "User is not allowed");
+            result.setStatus(result.getAccepted() ? "success" : "failed");
         }
+        log.info("ID Now returned status " + result.getStatus() + " with message " + result.getMessage());
         return result;
     }
 

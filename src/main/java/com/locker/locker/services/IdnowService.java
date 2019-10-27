@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -35,9 +36,9 @@ public class IdnowService {
                     log.error("ID image should contain full frontal portrait");
                     return "ID image should contain full frontal portrait";
                 }
-            } catch (HttpServerErrorException e) {
+            } catch (HttpStatusCodeException e) {
                 log.error("Error on ID image verification", e);
-                return "ID image verification failed";
+                return "Error on ID image verification";
             }
         }
         return "OK";
