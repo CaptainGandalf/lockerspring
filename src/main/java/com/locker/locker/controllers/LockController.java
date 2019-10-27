@@ -4,9 +4,11 @@ import com.locker.locker.dtos.LockDto;
 import com.locker.locker.dtos.GenericError;
 import com.locker.locker.dtos.LockStateDto;
 import com.locker.locker.entities.AccessLog;
+import com.locker.locker.entities.Key;
 import com.locker.locker.entities.Lock;
 import com.locker.locker.entities.User;
 import com.locker.locker.services.AccessLogService;
+import com.locker.locker.services.KeyService;
 import com.locker.locker.services.LockService;
 import com.locker.locker.services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,9 @@ public class LockController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    KeyService keyService;
 
     @Autowired
     AccessLogService accessLogService;
@@ -102,6 +108,20 @@ public class LockController {
             return ResponseEntity.badRequest().build();
         }
         List<Lock> locks = lockService.findByUser(userService.findById(userId).get()).get();
+        return ResponseEntity.ok(locks.stream().map( lock -> convertToDto(lock)).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/getSubscribedLocks/{userId}")
+    public ResponseEntity<List<LockDto>> getSubscribedLocks(@PathVariable Long userId){
+        if(!userService.findById(userId).isPresent()){
+            log.error("User " + userId + " does not exist");
+            return ResponseEntity.badRequest().build();
+        }
+        List<Lock> locks = new ArrayList<>();
+        List<Key> keys = keyService.findByIssuedFor(userService.findById(userId).get()).get();
+        for (Key key : keys) {
+            locks.add(lockService.findById(key.getLock().getId()).get());
+        }
         return ResponseEntity.ok(locks.stream().map( lock -> convertToDto(lock)).collect(Collectors.toList()));
     }
 

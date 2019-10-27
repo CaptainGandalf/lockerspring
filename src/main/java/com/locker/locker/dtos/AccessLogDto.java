@@ -21,6 +21,8 @@ public class AccessLogDto {
 
     private String lockDoor;
 
+    private String lockStatus;
+
     private Long userId;
 
     private String userEmail;

@@ -87,6 +87,7 @@ public class AccessLogController {
         accessLogDto.setLockId(lock.getId());
         accessLogDto.setLockAddress(lock.getAddress());
         accessLogDto.setLockDoor(lock.getDoor());
+        accessLogDto.setLockStatus(lock.getStatus());
         accessLogDto.setUserId(user.getId());
         accessLogDto.setUserEmail(user.getEmail());
         return accessLogDto;
