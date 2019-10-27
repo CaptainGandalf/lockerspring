@@ -31,9 +31,9 @@ public class UserController {
     ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> findAll() {
+    public ResponseEntity<List<UserSimpleDto>> findAll() {
         List<User> users = userService.findAll();
-        return ResponseEntity.ok(users.stream().map(user -> convertToDto(user)).collect(Collectors.toList()));
+        return ResponseEntity.ok(users.stream().map(user -> convertToSimpleDto(user)).collect(Collectors.toList()));
     }
 
     @PostMapping
@@ -80,6 +80,11 @@ public class UserController {
         }
         userService.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    private UserSimpleDto convertToSimpleDto(User user) {
+        UserSimpleDto userDto = modelMapper.map(user, UserSimpleDto.class);
+        return userDto;
     }
 
     private UserDto convertToDto(User user) {
