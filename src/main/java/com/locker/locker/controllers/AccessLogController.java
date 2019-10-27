@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,19 @@ public class AccessLogController {
             return ResponseEntity.badRequest().build();
         }
         List<AccessLog> logs = accessLogService.findByUser(userService.findById(userId).get()).get();
+        return ResponseEntity.ok(logs.stream().map( log -> convertToDto(log)).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/getOwnerLogs/{userId}")
+    public ResponseEntity<List<AccessLogDto>> getOwnerLogs(@PathVariable Long userId){
+        if(!userService.findById(userId).isPresent()){
+            log.error("User " + userId + " does not exist");
+            return ResponseEntity.badRequest().build();
+        }
+        List<AccessLog> logs = new ArrayList<>();
+        for(Lock l : lockService.findByUser(userService.findById(userId).get()).get()){
+            logs.addAll(accessLogService.findByLock(l).get());
+        }
         return ResponseEntity.ok(logs.stream().map( log -> convertToDto(log)).collect(Collectors.toList()));
     }
 
